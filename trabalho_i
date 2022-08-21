@@ -95,7 +95,7 @@ while [[ $# -gt 0 ]]; do
             read -p "Qual vai ser o nome do novo arquivo? " arquivo
             [[ -f $arquivo ]] && echo "Erro! O Nome do Arquivo Já Existe!" && exit 1 
 
-            echo '#!/usr/bin/env bash' >$arquivo 
+            echo "$cabecalho_editor" > $arquivo 
             chmod +x $arquivo
             $editor $arquivo
             exit 0
