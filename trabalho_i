@@ -1,0 +1,110 @@
+#!/usr/bin/env bash
+
+#__________________________________________________Cabeçalho_______________________________________________________
+
+# Script   : trabalho_i
+# Descrição: Faz o gerenciamento de arquivos, criando novos scripts, visualizar o texto 
+#            escrito em arqivos e informa dados basicos do arquivo.
+# Autor    : Eudes de Araújo Nunes
+# Data     : 16/08/2022
+# Versão   : 1.0.7
+#__________________________________________________Variaveis____________________________________________________
+
+versao="Versão 1.0.7"
+ajuda="
+*-------------------------------------------*Help*---------------------------------------------
+* Informe um dos Parâmetros para execução do programa.
+* Apenas um parâmetro é aceito por vez.
+* Exemplo: ./trabalho_i --help
+* Parametros:
+* --help  ou -h   : Exibi as opções de uso do programa.
+* --version ou -v : Exibi a versão do programa.
+* --ler ou -l     : Exibir as informaçoes escrita do arquivo selecionado através do terminal.
+* --info ou -i    : Informa os dados básicos do arquivo selecionado. 
+* --new ou -n     : Criar um novo script com o nome selecionado e abre em um editor.
+*----------------------------------------------------------------------------------------------
+"
+editor="vim"
+
+cabecalho_editor="#!/usr/bin/env bash
+#----------------Cabeçalho-----------------------
+# Script   :
+# Descrição:
+# Autor    :
+# Data     :
+# Versão   :
+#------------------------------------------------
+"
+
+#_____________________________________________________Corpo________________________________________________________
+
+[[ $# -ne 1 ]] && echo "Adicione um parametro! Use *--help* ou *-h* para ajudar." && exit 1
+
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+
+        --help | -h)
+            echo "$ajuda"
+            exit 0
+            ;;
+
+        
+        --version | -v)
+            echo $versao
+            exit 0
+            ;;
+
+        --ler | -l)
+            line=1
+            read -p "Qual é o arquivo? " arquivo
+            [[ ! -f $arquivo ]] && echo "Erro! Arquivo não encontrado" && exit 1 
+            
+            while read -r CURRENT_LINE
+            do  
+                echo "$line: $CURRENT_LINE"
+                ((line++))
+            done <$arquivo
+            exit 0
+            ;;
+            
+        --info | -i)
+            read -p "Qual é o arquivo? " arquivo
+            [[ ! -f $arquivo ]] && echo "Erro! Arquivo não encontrado" && exit 1 
+
+            nomearq=$(stat --format='%n' $arquivo)
+            usuarioprop=$(stat --format='%U' $arquivo)
+            datanasc=$(stat --format='%w' $arquivo)
+            dataacesso=$(stat --format='%x' $arquivo)
+            datamodif=$(stat --format='%y' $arquivo)
+            formatoinfo="
+            -----------------#info#----------------
+            *Nome do Arquivo      : '$nomearq'
+            *Usuário Proprietário : '$usuarioprop'
+            ---------------------------------------
+            *Data de Criação : '$datanasc'
+            *Ultima Data de Acesso : '$dataacesso'
+            *Data de Modificação : '$datamodif'
+            ----------------------------------------
+            "
+            echo  "$formatoinfo"
+            exit 0
+            ;;
+
+        --new | -n)
+            read -p "Qual vai ser o nome do novo arquivo? " arquivo
+            [[ -f $arquivo ]] && echo "Erro! O Nome do Arquivo Já Existe!" && exit 1 
+
+            echo '#!/usr/bin/env bash' >$arquivo 
+            chmod +x $arquivo
+            $editor $arquivo
+            exit 0
+            ;;
+
+        *)
+            echo "Parametro '$1' invalido! Use *--help* ou *-h* para ajudar.":
+             exit 1
+             ;;
+    esac
+    shift
+done
