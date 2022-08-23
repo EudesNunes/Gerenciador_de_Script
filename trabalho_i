@@ -37,7 +37,7 @@ cabecalho_editor="#!/usr/bin/env bash
 "
 
 #_____________________________________________________Corpo________________________________________________________
-echo "$ajuda"
+[[ $# -eq 0 ]] && echo "$ajuda" && exit 0
 [[ $# -ne 1 ]] && echo "Adicione um parametro! Use *--help* ou *-h* para ajudar." && exit 1
 
 
